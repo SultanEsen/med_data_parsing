@@ -4,7 +4,8 @@ from pathlib import Path
 from pprint import pprint
 
 from database import Database
-from models.uzb import IDataResponse, UzbData
+from models.uzb import IDataResponse as UZBDataResponse, UzbData
+from models.turk import IDataResponse as TurkDataResponse, TurkData
 
 
 app = FastAPI()
@@ -23,8 +24,8 @@ app.add_middleware(
 )
 
 
-@app.get("/uzb", response_model=IDataResponse)
-async def root(page: int = 1):
+@app.get("/uzb", response_model=UZBDataResponse)
+async def uzbekistan_data(page: int = 1):
     data = await database.fetch(
         """SELECT * FROM uzbekistan_data LIMIT 20 OFFSET ?""",
         ((page - 1) * 20,),
@@ -51,4 +52,27 @@ async def root(page: int = 1):
             "current_retail_price",
             "current_wholesale_price",
         ],
+    }
+
+@app.get("/turk", response_model=TurkDataResponse)
+async def turkey_data(page: int = 1):
+    data = await database.fetch(
+        """SELECT * FROM turkey_data LIMIT 20 OFFSET ?""",
+        ((page - 1) * 20,),
+        fetch_type="all",
+    )
+    meta_data = await database.fetch(
+        """SELECT COUNT(*) FROM turkey_data""",
+        fetch_type="one",
+    )
+    return {
+        "data": data,
+        "pages": meta_data['COUNT(*)'] // 20 + 1,
+        "page": page,
+        "columns": [
+            "id",
+            "medicine_info",
+            "company_name",
+            "price",
+        ]
     }
