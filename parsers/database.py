@@ -1,5 +1,4 @@
 import aiosqlite
-from datetime import datetime
 
 from parsers.queries import Queries
 
@@ -26,40 +25,3 @@ class Database:
         async with aiosqlite.connect(self.path) as conn:
             await conn.execute(query, params)
             await conn.commit()
-
-
-class DocumentRepo:
-    def __init__(self, session):
-        self.session = session
-
-    async def add(self, url):
-        item = await self.session.execute(
-            """
-            INSERT INTO latest_documents (url, created_at) VALUES (?, ?)
-            """,
-            (url, datetime.utcnow())
-        )
-
-    async def get(self, url):
-        item = await self.session.fetch(
-            """
-            SELECT * FROM latest_documents WHERE url = ?
-            """,
-            (url,),
-            fetch_type="one"
-        )
-        return item
-
-    async def list(self):
-        items = await self.session.fetch(
-            """
-            SELECT * FROM latest_documents
-            """,
-            fetch_type="all"
-        )
-        return items
-
-
-class DataRepo:
-    def __init__(self, session):
-        self.session = session

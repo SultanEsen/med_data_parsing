@@ -4,7 +4,7 @@ from pprint import pprint
 from pathlib import Path
 
 from parsers.database import Database
-from parsers.service import UZBService
+from parsers.uzb.service import UZBService
 
 
 async def main():
@@ -16,7 +16,9 @@ async def main():
 
     # crawl and parse
     service = UZBService(database)
-    await service.parse()
+    # await service.parse()
+    print("Count: ", await service.data_repo.count())
+    pprint(await service.data_repo.list())
 
 
 if __name__ == "__main__":
