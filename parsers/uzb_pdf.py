@@ -1,7 +1,11 @@
-import camelot
+import tabula
 import logging
 
 
-def read_file(path):
-    tables = camelot.read_pdf(path, pages="all")
-    logging.info(f"Found {len(tables)} tables")
+class UZBFileParser:
+    @classmethod
+    def read_file(cls, path):
+        logging.info(f"Reading {path}")
+        tables = tabula.read_pdf(path, pages="all")
+        logging.info(f"Found {len(tables)} tables")
+        return tables
