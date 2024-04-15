@@ -1,0 +1,126 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  /* color-scheme: light dark; */
+  /* color: rgba(255, 255, 255, 0.87); */
+  /* background-color: #242424; */
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  /* display: flex; */
+  /* place-items: center; */
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  /* border-radius: 8px; */
+  border: 1px solid #ccc;
+  padding: 0.4em 0.75em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  /* background-color: #1a1a1a; */
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+
+table {
+  width: 100%;
+  margin-top: 1rem;
+  /* margin-inline: 1rem; */
+  scroll-behavior: smooth;
+}
+
+table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+table td {
+  padding: 6px;
+  text-align: left;
+  font-size: 14px;
+}
+
+ul {
+  list-style-type: none;
+  display: flex;
+  gap: 0.9rem;
+}
+
+#app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.container {
+  width: 100%;
+  /* padding-block: 2rem; */
+  /* padding-inline: 1rem; */
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  position: sticky;
+  top: 0;
+  background-color: #fff;
+  z-index: 1;
+  padding-bottom: 5px;
+}
+
+#countries button.active, #pagination button.active {
+  background-color: #91adff;
+  color: #fff;
+  border-color: #91adff;
+}
+
+.search-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.search-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.search-form {
+  display: flex;
+  gap: 0.5rem;
+}

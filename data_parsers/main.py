@@ -9,7 +9,7 @@ from parsers.uzb.service import UZBService
 
 async def main():
     # create database
-    db_path = Path(__file__).parent / "db.sqlite3"
+    db_path = Path(__file__).parent.parent / "db.sqlite3"
     print(db_path)
     database = Database(db_path)
     await database.create_tables()

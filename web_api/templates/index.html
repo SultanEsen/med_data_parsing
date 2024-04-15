@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Index Page with data from sources</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="{{ url_for('static', path='css/style.css') }}" rel="stylesheet">
+</head>
+
+<body>
+  <div class="container">
+    <h2>Index Page with data from sources</h2>
+    <table>
+      <tr>
+        <th>ID</th>
+        <th>Package ID</th>
+        <th>Trade mark name</th>
+        <th>MNN</th>
+        <th>Producer</th>
+        <th>Package</th>
+        <th>Registration number</th>
+        <th>Currency</th>
+        <th>Limit price</th>
+        <th>Current retail price</th>
+        <th>Current wholesale price</th>
+      </tr>
+      {% for med in data %}
+      <tr>
+          <td>{{ med.id }}</td>
+          <td>{{ med.package_id }}</td>
+          <td>{{ med.trade_mark_name }}</td>
+          <td>{{ med.mnn}}</td>
+          <td>{{ med.producer }}</td>
+          <td>{{ med.package}}</td>
+          <td>{{ med.registration_number }}</td>
+          <td>{{ med.currency }}</td>
+          <td>{{ med.limit_price }}</td>
+          <td>{{ med.current_retail_price }}</td>
+          <td>{{ med.current_wholesale_price }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</body>
+
+</html>
