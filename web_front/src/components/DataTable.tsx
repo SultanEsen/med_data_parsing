@@ -1,21 +1,26 @@
 import { reatomComponent } from "@reatom/npm-react";
 
-import { fetchData, countryAtom } from "../model";
+import { fetchData, countryAtom, columnsAtom } from "../model";
 
 const DataTable = reatomComponent(({ ctx }) => {
   const dataRows = ctx.spy(fetchData.dataAtom).get(ctx.get(countryAtom))?.data;
+  const cols = ctx.spy(columnsAtom);
 
   return (
     <table>
       <thead>
-        <tr id="table-header"></tr>
+        <tr id="table-header">
+          {cols.map((col) => (
+            <th key={col}>{col.replace(/_/g, " ")}</th>
+          ))}
+        </tr>
       </thead>
       <tbody>
         {dataRows?.map((row) => (
           <tr key={row.id}>
-            <td>{row.id}</td>
-            <td>{row.package_id}</td>
-            <td>{row.trade_mark_name}</td>
+            {cols.map((col) => (
+              <td key={col}>{row[col]}</td>
+            ))}
           </tr>
         ))}
       </tbody>

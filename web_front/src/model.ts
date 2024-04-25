@@ -25,6 +25,11 @@ export const updatePage = action((ctx, page: number) => {
   pageAtom(ctx, new Map([...ctx.get(pageAtom), [ctx.get(countryAtom), page]]));
 });
 
+export const updateCountry = action((ctx, country: string) => {
+  countryAtom(ctx, country);
+  pageAtom(ctx, new Map([[country, 1]]));
+})
+
 const ApiUrl = "http://localhost:8000/";
 const apiUrlAtom = atom((ctx) => {
   const page = ctx.spy(pageAtom);

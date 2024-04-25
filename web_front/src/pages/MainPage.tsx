@@ -21,7 +21,7 @@ const MainPage = reatomComponent(({ ctx }) => {
         <div className="header">
           <h4>Index Page with data from sources</h4>
           <CountriesList />
-          <button onClick={() => redirect(ctx, "/search")}>Search</button>
+          {/* <button onClick={() => redirect(ctx, "/search")}>Search</button> */}
           {showPagination && <Pagination />}
         </div>
         {/* <SearchDialog showModal={showModal} setShowModal={setShowModal} /> */}

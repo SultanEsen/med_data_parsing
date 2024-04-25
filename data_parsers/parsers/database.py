@@ -9,8 +9,12 @@ class Database:
 
     async def create_tables(self):
         async with aiosqlite.connect(self.path) as conn:
+            await conn.execute(Queries.VACUUM)
             await conn.execute(Queries.CREATE_LATEST_DOCUMENTS_TABLE)
+            await conn.execute(Queries.DROP_UZBEKISTAN_DATA_TABLE)
             await conn.execute(Queries.CREATE_UZBEKISTAN_DATA_TABLE)
+            await conn.execute(Queries.DROP_TURKEY_DATA_TABLE)
+            await conn.execute(Queries.CREATE_TURKEY_DATA_TABLE)
             await conn.commit()
 
     async def fetch(self, query: str, params: tuple = (), fetch_type: str = "all"):

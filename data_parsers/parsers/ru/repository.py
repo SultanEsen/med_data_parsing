@@ -2,9 +2,6 @@ from datetime import datetime
 import logging
 
 
-logger = logging.getLogger(__name__)
-
-
 class DocumentRepo:
     def __init__(self, session):
         self.session = session
@@ -43,7 +40,7 @@ class DataRepo:
 
     async def add(self, df):
         for _, row in df.iterrows():
-            # logger.info(row.iloc[0:10])
+            logging.info(row.iloc[0:10])
             await self.session.execute(
                 """
                 INSERT INTO uzbekistan_data
