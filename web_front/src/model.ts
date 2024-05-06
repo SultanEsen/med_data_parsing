@@ -17,9 +17,9 @@ export const redirect = action((ctx, path: string) => {
   window.location.pathname = path;
 })
 
+
 export const countryAtom = atom("Uzb", "countryAtom");
 export const pageAtom = atom(new Map([[ctx.get(countryAtom), 1]]), "pageAtom");
-export const columnsAtom = atom(new Array(), "columnsAtom");
 
 export const updatePage = action((ctx, page: number) => {
   pageAtom(ctx, new Map([...ctx.get(pageAtom), [ctx.get(countryAtom), page]]));
@@ -30,7 +30,24 @@ export const updateCountry = action((ctx, country: string) => {
   pageAtom(ctx, new Map([[country, 1]]));
 })
 
-const ApiUrl = "http://localhost:8000/";
+export const columnsAtom = atom(new Array(), "columnsAtom");
+export const selectedColumnsAtom = atom(new Map(), "selectedColumnsAtom");
+export const updateSelectedColumns = action((ctx, column: string) => {
+  const country = ctx.get(countryAtom);
+  const selectedColumns = ctx.get(selectedColumnsAtom);
+  if (selectedColumns.has(country)) {
+    if (selectedColumns.get(country).includes(column)) {
+      selectedColumnsAtom(ctx, new Map([...selectedColumns, [country, selectedColumns.get(country).filter((item) => item !== column)]]));
+    } else {
+      selectedColumnsAtom(ctx, new Map([...selectedColumns, [country, [...selectedColumns.get(country), column]]]));
+    }
+  }
+  else {
+    selectedColumnsAtom(ctx, new Map([...selectedColumns, [country, [column]]]));
+  }
+})
+
+const ApiUrl = "http://localhost:8000";
 const apiUrlAtom = atom((ctx) => {
   const page = ctx.spy(pageAtom);
   const country = ctx.spy(countryAtom);
@@ -38,10 +55,10 @@ const apiUrlAtom = atom((ctx) => {
   let urlAtom = `${ApiUrl}`;
 
   if (country === "") {
-    urlAtom = `${ApiUrl}uzb`;
+    urlAtom = `${ApiUrl}/uzb`;
   }
   if (country !== "") {
-    urlAtom = `${urlAtom}${country.toLowerCase()}`;
+    urlAtom = `${urlAtom}/${country.toLowerCase()}`;
   }
   if (page.has(country) && page.get(country) !== 0) {
     urlAtom = `${urlAtom}?page=${page.get(country)}`;

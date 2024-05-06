@@ -4,7 +4,7 @@ import { pageAtom, paginationAtom, countryAtom, updatePage } from "../model";
 
 const Pagination = reatomComponent(({ ctx }) => {
   return (
-    <div>
+    <div className="pagination-container">
       <ul id="pagination">
         {ctx.spy(paginationAtom)?.pages?.map((page, idx) => (
           <li key={page+idx}>

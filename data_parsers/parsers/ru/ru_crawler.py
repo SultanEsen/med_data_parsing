@@ -6,19 +6,35 @@ import logging
 from parsers.base import Crawler
 
 
-class UZBCrawler(Crawler):
-    MAIN_URL = "https://uzpharmagency.uz/ru/menu/referentnye-tseny"
-    BASE_URL = "https://uzpharmagency.uz"
-    DOCUMENTS_DIRECTORY = "uzb"
+logger = logging.getLogger(__name__)
+
+
+class RuCrawler(Crawler):
+    MAIN_URL = "https://grls.rosminzdrav.ru/LimPriceArchive.aspx"
+    BASE_URL = "https://grls.rosminzdrav.ru"
+    DOCUMENTS_DIRECTORY = "rus"
 
     def __init__(self, url):
         super().__init__(url)
-        logging.info(f"Loading {url} for UZB crawler")
+        logging.info(f"Loading {url} for Rus crawler")
         self.url = url
 
-    def get_initial_page(self):
+    def get_page(self, url=''):
+        if not url:
+            url = self.url
         response = self.session.get(self.url)
-        yield response.text
+        return response.text
+
+    def find_date_link(self, text):
+        html = Selector(text)
+        # table = html.css("table.ts1 tbody td a")
+        table = html.css("table.ts1").css("td").css("a")
+        if not len(table):
+            logging.info("Table not found")
+            return
+        last_cell = table[-1].attrib["href"]
+        logger.info(f"Last cell: {last_cell}")
+        return last_cell
 
     def find_latest_document(self, text):
         html = Selector(text)

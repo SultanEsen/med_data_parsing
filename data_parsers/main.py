@@ -5,8 +5,9 @@ from pathlib import Path
 
 from parsers.database import Database
 from parsers.uzb.service import UZBService
-from parsers.kz.service import KAZService
+from parsers.kz.service import KazService
 from parsers.tr.service import TURKService
+from parsers.ru.service import RuService
 
 
 logger = logging.getLogger(__name__)
@@ -24,13 +25,15 @@ async def main():
     # await service.parse()
     # pprint(await service.data_repo.list())
 
-    # service = KAZService()
+    # service = KazService(database)
     # await service.parse()
 
-    service = TURKService(database)
-    await service.parse()
-    print("Count: ", await service.data_repo.count())
+    # service = TURKService(database)
+    # await service.parse()
+    # print("Count: ", await service.data_repo.count())
 
+    service = RuService(database)
+    await service.parse()
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)

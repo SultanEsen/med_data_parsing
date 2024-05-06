@@ -1,22 +1,18 @@
 from pydantic import BaseModel
 
 
-class UzbData(BaseModel):
+class KazData(BaseModel):
     id: int
-    package_id: int
     trade_mark_name: str
     mnn: str
+    dosage_form: str
     producer: str
-    package: str
     registration_number: str
-    currency: str
-    limit_price: float
-    current_retail_price: str
-    current_wholesale_price: str
+    limit_price: str
 
 
 class IDataResponse(BaseModel):
-    data: list[UzbData]
+    data: list[KazData]
     pages: int
     page: int
     columns: list[str]

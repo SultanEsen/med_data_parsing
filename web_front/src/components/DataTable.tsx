@@ -1,10 +1,10 @@
 import { reatomComponent } from "@reatom/npm-react";
 
-import { fetchData, countryAtom, columnsAtom } from "../model";
+import { fetchData, countryAtom, selectedColumnsAtom } from "../model";
 
 const DataTable = reatomComponent(({ ctx }) => {
   const dataRows = ctx.spy(fetchData.dataAtom).get(ctx.get(countryAtom))?.data;
-  const cols = ctx.spy(columnsAtom);
+  const cols = ctx.spy(selectedColumnsAtom).get(ctx.get(countryAtom));
 
   return (
     <table>

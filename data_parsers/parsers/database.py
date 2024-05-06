@@ -15,6 +15,10 @@ class Database:
             await conn.execute(Queries.CREATE_UZBEKISTAN_DATA_TABLE)
             await conn.execute(Queries.DROP_TURKEY_DATA_TABLE)
             await conn.execute(Queries.CREATE_TURKEY_DATA_TABLE)
+            await conn.execute(Queries.DROP_KAZAKHSTAN_DATA_TABLE)
+            await conn.execute(Queries.CREATE_KAZAKHSTAN_DATA_TABLE)
+            await conn.execute(Queries.DROP_RUSSIA_DATA_TABLE)
+            await conn.execute(Queries.CREATE_RUSSIA_DATA_TABLE)
             await conn.commit()
 
     async def fetch(self, query: str, params: tuple = (), fetch_type: str = "all"):
@@ -28,4 +32,9 @@ class Database:
     async def execute(self, query: str, params: tuple = ()):
         async with aiosqlite.connect(self.path) as conn:
             await conn.execute(query, params)
+            await conn.commit()
+
+    async def execute_many(self, query: str, params: tuple = ()):
+        async with aiosqlite.connect(self.path) as conn:
+            await conn.executemany(query, params)
             await conn.commit()

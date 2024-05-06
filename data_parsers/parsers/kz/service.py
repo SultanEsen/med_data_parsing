@@ -1,64 +1,76 @@
-from parsers.base import Crawler
-from parsel import Selector
-import requests
-from datetime import datetime
+from parsers.kz.kaz_crawler import KazCrawler
+from parsers.kz.kaz_parser import KazFileParser
+from parsers.kz.repository import DocumentRepo, DataRepo
+from utils import get_latest_files
+
+from pathlib import Path
+import pandas as pd
 import logging
 
 
-class KAZCrawler(Crawler):
-    MAIN_URL = "https://pharmnewskz.com/ru/legislation/prikaz-mz-rk-ot-7-avgusta-2023-goda--465_7459"
-    BASE_URL = "https://pharmnewskz.com"
-    DOCUMENTS_DIRECTORY = "kaz"
-
-    def __init__(self, url):
-        super().__init__(url)
-        logging.info(f"Loading {url} for KAZ crawler")
-        self.url = url
-
-    def get_initial_page(self):
-        response = self.session.get(self.url)
-        yield response.text
-
-    def find_document_link(self, text):
-        html = Selector(text)
-        nodes = html.css("a.loadDoc")
-        logging.info(f"Found {len(nodes)} links")
-        if nodes and len(nodes) > 0:
-            full_path = self.BASE_URL + nodes[-1].attrib["href"]
-            logging.info(f"Full path: {full_path}")
-            return full_path
-
-    def load_document(self, url=''):
-        logging.info(f"Loading {url}")
-        try:
-            response = self.session.get(url)
-        except requests.exceptions.HTTPError:
-            logging.error(f"Failed to download {url} due to HTTP error")
-        else:
-            if response.status_code == 200:
-                logging.info("Loading ...")
-                file_name = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-                file_path = f"{self.GENERAL_DOCUMENTS_DIRECTORY}/{self.DOCUMENTS_DIRECTORY}/{file_name}.docx"
-                with open(file_path, "wb") as f:
-                    for chunk in response.iter_content(chunk_size=1024):
-                        if chunk:
-                            f.write(chunk)
-                logging.info(f"Saved to {file_path}")
-                return file_path
+logger = logging.getLogger(__name__)
 
 
-class KAZService:
-    def __init__(self):
-        self.crawler = KAZCrawler(KAZCrawler.MAIN_URL)
+class KazService:
+    def __init__(self, session):
+        self.crawler = KazCrawler(KazCrawler.MAIN_URL)
+        self.parser = KazFileParser()
+        self.repo = DocumentRepo(session)
+        self.data_repo = DataRepo(session)
+        self.tables = ()
         self.file = ''
+        self.headings = ()
 
     async def download_file(self):
-        for text in self.crawler.get_initial_page():
-            logging.info("Searching ...")
-            urls = self.crawler.find_document_link(text)
-            logging.info(f"Found {urls}")
-            if urls:
-                self.crawler.load_document(urls)
+        initial_page = self.crawler.get_page()
+        if initial_page:
+            iframe_page = self.crawler.find_iframe_link(initial_page)
+            if iframe_page:
+                document_page = self.crawler.find_document_link(iframe_page)
+                if document_page:
+                    self.file = self.crawler.load_document(document_page)
+
+    def process_headings(self, headings: list):
+        return list(map(lambda x: x.replace('\n', ''), headings))
+
+    def parse_data(self):
+        file = get_latest_files(KazCrawler.DOCUMENTS_DIRECTORY)
+        if file:
+            file_path = Path(
+                KazCrawler.GENERAL_DOCUMENTS_DIRECTORY,
+                KazCrawler.DOCUMENTS_DIRECTORY,
+                file
+            )
+            self.file = file_path
+            file = self.parser.read_file(file_path)
+            for ind, page in enumerate(file):
+                if len(page) == 0:
+                    # if no tables on page
+                    continue
+                if ind > 3:
+                    break
+                # if headingd not set yet and there are tables on page
+                if len(page[0]) != 0 and not self.headings:
+                    self.headings = self.process_headings(page[0][0])
+                    data = page[0][1:]
+                else:
+                    data = page[0]
+                yield pd.DataFrame(data, columns=self.headings), ind
+
+    async def save_data(self):
+        for df, ind in self.parse_data():
+            # # df = self.process_columns(df, ind)
+            data: pd.DataFrame = df[[
+                'Торговоенаименование',
+                'МНН',
+                'Лекарственнаяформа',
+                'Производитель',
+                'Регистрационноеудостоверение',
+                'Предельная ценапроизводителя'
+            ]]
+            await self.data_repo.add(data.values.tolist())
+            logger.info(f"Saved {data.shape[0]} rows")
 
     async def parse(self):
-        await self.download_file()
+        # await self.download_file()
+        await self.save_data()

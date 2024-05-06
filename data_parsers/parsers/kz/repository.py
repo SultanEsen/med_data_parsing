@@ -44,23 +44,22 @@ class DataRepo:
     async def add(self, df):
         await self.session.execute_many(
             """
-            INSERT INTO uzbekistan_data
-            (package_id, trade_mark_name, mnn,
-             producer, package, registration_number,
-             currency, limit_price, current_retail_price,
-             current_wholesale_price) VALUES
-            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO kazakhstan_data (
+                    trade_mark_name,
+                    mnn,
+                    dosage_form,
+                    producer,
+                    registration_number,
+                    limit_price
+                ) VALUES (?, ?, ?, ?, ?, ?)
             """,
-            # The number of columns in the table is 11,
-            # we are sving only 10 for now
-            # (row.iloc[0:10])
             df
         )
 
     async def count(self):
         count = await self.session.fetch(
             """
-            SELECT COUNT(*) FROM uzbekistan_data
+            SELECT COUNT(*) FROM kazakhstan_data
             """
         )
         return count
@@ -68,7 +67,7 @@ class DataRepo:
     async def get(self, id):
         item = await self.session.fetch(
             """
-            SELECT * FROM uzbekistan_data WHERE id = ?
+            SELECT * FROM kazakhstan_data WHERE id = ?
             """,
             (id,),
             fetch_type="one"
@@ -78,7 +77,7 @@ class DataRepo:
     async def list(self):
         items = await self.session.fetch(
             """
-            SELECT * FROM uzbekistan_data
+            SELECT * FROM kazakhstan_data
             """,
             fetch_type="all"
         )
