@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import { reatomComponent } from "@reatom/npm-react";
-import { columnsAtom, updateSelectedColumns } from "../model";
+import { fetchData, updateSelectedColumns, selectedColumnsAtom, countryAtom } from "../model";
 
 const ColumnsSelectBox = reatomComponent(({ ctx }) => {
   const [showModal, setShowModal] = useState(false);
+  const selectedColsInd = ctx.spy(selectedColumnsAtom).get(ctx.get(countryAtom));
+  const country = ctx.spy(countryAtom);
+  const columns = ctx.spy(fetchData.dataAtom).get(country)?.columns
 
   const selectColumns = (event: React.ChangeEvent<HTMLInputElement>) => {
     const target = event.target as HTMLInputElement;
-    updateSelectedColumns(ctx, target.value);
+    updateSelectedColumns(ctx, Number(target.value));
   };
 
   return (
@@ -17,9 +20,15 @@ const ColumnsSelectBox = reatomComponent(({ ctx }) => {
       </button>
       <div className={`columns-modal ${showModal ? "show" : ""}`}>
         <div className="columns-container">
-          {ctx.spy(columnsAtom).map((column) => (
+          {columns.map((column, ind) => (
             <label>
-              <input type="checkbox" key={column} value={column} onChange={selectColumns} />
+              <input
+                type="checkbox"
+                key={column}
+                value={ind}
+                onChange={selectColumns}
+                checked={selectedColsInd.includes(ind)}
+              />
               {column}
             </label>
           ))}

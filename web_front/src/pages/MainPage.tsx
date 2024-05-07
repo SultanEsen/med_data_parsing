@@ -7,10 +7,8 @@ import CountriesList from "../components/CountriesList";
 // import SearchDialog from "../components/Search";
 import ColumnsSelectBox from "../components/ColumnsSelectBox";
 
-
 const MainPage = reatomComponent(({ ctx }) => {
-
-  const showPagination =
+  const showPaginationColumns =
     !ctx.spy(fetchData.errorAtom) && ctx.spy(paginationAtom).country === ctx.get(countryAtom);
   const showError = ctx.spy(fetchData.errorAtom);
   const showData = ctx.spy(fetchData.dataAtom)?.get(ctx.get(countryAtom));
@@ -22,8 +20,12 @@ const MainPage = reatomComponent(({ ctx }) => {
           {/* <h4>Index Page with data from sources</h4> */}
           <CountriesList />
           {/* <button onClick={() => redirect(ctx, "/search")}>Search</button> */}
-          {showPagination && <Pagination />}
-          <ColumnsSelectBox />
+          {showPaginationColumns && (
+            <div>
+              <Pagination />
+              {showData && <ColumnsSelectBox />}
+            </div>
+          )}
         </div>
         {/* <SearchDialog showModal={showModal} setShowModal={setShowModal} /> */}
         {showError && <div id="error">{ctx.spy(fetchData.errorAtom)}</div>}
