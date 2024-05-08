@@ -59,7 +59,10 @@ export const updateSelectedColumns = action((ctx, column: number) => {
     } else {
       selectedColumnsAtom(
         ctx,
-        new Map([...selectedColumns, [country, [...selectedColumns.get(country), column].sort()]]),
+        new Map([
+          ...selectedColumns,
+          [country, [...selectedColumns.get(country), column].sort((a, b) => a - b)],
+        ]),
       );
     }
   } else {

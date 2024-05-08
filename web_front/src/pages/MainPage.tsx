@@ -21,7 +21,7 @@ const MainPage = reatomComponent(({ ctx }) => {
           <CountriesList />
           {/* <button onClick={() => redirect(ctx, "/search")}>Search</button> */}
           {showPaginationColumns && (
-            <div>
+            <div className="controls-container">
               <Pagination />
               {showData && <ColumnsSelectBox />}
             </div>

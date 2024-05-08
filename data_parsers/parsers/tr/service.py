@@ -42,7 +42,7 @@ class TURKService:
             self.tables = self.parser.read_file(file_path)
 
     async def save_data(self):
-        pprint(self.tables) 
+        pprint(self.tables)
         print(type(self.tables))
         # for ind, table in enumerate(self.tables):
         #     if ind > 2:

@@ -16,23 +16,27 @@ logger = logging.getLogger(__name__)
 async def main():
     # create database
     db_path = Path(__file__).parent.parent / "db.sqlite3"
-    print(db_path)
+    # print(db_path)
     database = Database(db_path)
     await database.create_tables()
 
     # crawl and parse
-    # service = UZBService(database)
-    # await service.parse()
+    service = UZBService(database)
+    logger.info("Starting UZB")
+    await service.parse()
     # pprint(await service.data_repo.list())
 
-    # service = KazService(database)
-    # await service.parse()
+    service = KazService(database)
+    logger.info("Starting KAZ")
+    await service.parse()
 
-    # service = TURKService(database)
-    # await service.parse()
+    service = TURKService(database)
+    logger.info("Starting TURK")
+    await service.parse()
     # print("Count: ", await service.data_repo.count())
 
     service = RuService(database)
+    logger.info("Starting RU")
     await service.parse()
 
 if __name__ == "__main__":
