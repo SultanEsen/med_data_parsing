@@ -1,0 +1,9 @@
+version: '1'
+
+services:
+  web:
+    build: ./web_api
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/src

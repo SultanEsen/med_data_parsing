@@ -1,8 +1,9 @@
-import { action, atom, batch, createCtx } from "@reatom/core";
+import { action, batch, atom, createCtx } from "@reatom/core";
 import {
   reatomAsync,
   withDataAtom,
   withErrorAtom,
+  withAbort,
   onConnect,
   connectLogger,
 } from "@reatom/framework";
@@ -10,9 +11,11 @@ import {
 export const ctx = createCtx();
 connectLogger(ctx);
 
-export const countries = [
-  { name: "uzb", path: "/uzb", label: "Uzbek" },
-  { name: "kaz", path: "/kaz", label: "Kazakh" },
+export type Countries = "uzb" | "kaz" | "rus" | "blr" | "ukr" | "turk" | "mld";
+
+export const countries: { name: Countries; path: string; label: string }[] = [
+  { name: "uzb", path: "/uzb", label: "Uzbekistan" },
+  { name: "kaz", path: "/kaz", label: "Kazakhstan" },
   { name: "rus", path: "/rus", label: "Russia" },
   { name: "blr", path: "/blr", label: "Belarus" },
   { name: "ukr", path: "/ukr", label: "Ukraine" },
@@ -26,92 +29,80 @@ export const redirect = action((ctx, path: string) => {
   window.location.pathname = path;
 });
 
-export const countryAtom = atom("uzb", "countryAtom");
+export const countryAtom = atom<Countries>("uzb", "countryAtom");
 export const pageAtom = atom(new Map([[ctx.get(countryAtom), 1]]), "pageAtom");
 
 export const updatePage = action((ctx, page: number) => {
   pageAtom(ctx, new Map([...ctx.get(pageAtom), [ctx.get(countryAtom), page]]));
 });
 
-export const updateCountry = action((ctx, country: string) => {
-  countryAtom(ctx, country);
-  pageAtom(ctx, new Map([[country, 1]]));
+export const updateCountry = action((ctx, country: Countries) => {
+  // batch(ctx, () => {
+    countryAtom(ctx, country);
+    // pageAtom(ctx, new Map([...ctx.get(pageAtom), [country, 1]]));
+  // })
 });
 
 export const selectedColumnsAtom = atom(
-  new Map(countries.map((country) => [country.name, [0, 1, 2]])),
+  new Map<Countries, number[]>(countries.map((country) => [country.name, [0, 1, 2]])),
   "selectedColumnsAtom",
 );
 
 export const updateSelectedColumns = action((ctx, column: number) => {
   const country = ctx.get(countryAtom);
   const selectedColumns = ctx.get(selectedColumnsAtom);
+  const countryColumns = selectedColumns.get(country);
   column = Number(column);
-  if (selectedColumns.has(country)) {
-    if (selectedColumns.get(country).includes(column)) {
+  if (countryColumns && countryColumns.includes(column)) {
       selectedColumnsAtom(
         ctx,
         new Map([
           ...selectedColumns,
-          [country, selectedColumns.get(country).filter((item) => item !== column)],
+          [country, countryColumns.filter((item) => item !== column)],
         ]),
       );
-    } else {
+  } else if (countryColumns) {
+    
       selectedColumnsAtom(
         ctx,
         new Map([
           ...selectedColumns,
-          [country, [...selectedColumns.get(country), column].sort((a, b) => a - b)],
+          [country, [...countryColumns, column].sort((a, b) => a - b)],
         ]),
       );
-    }
   } else {
     selectedColumnsAtom(ctx, new Map([...selectedColumns, [country, [column]]]));
   }
 });
 
-const ApiUrl = "http://localhost:8000";
+const ApiUrl = import.meta.env.VITE_API_ADDRESS;
 const apiUrlAtom = atom((ctx) => {
   const page = ctx.spy(pageAtom);
   const country = ctx.spy(countryAtom);
 
   let urlAtom = `${ApiUrl}`;
 
-  if (country === "") {
-    urlAtom = `${ApiUrl}/uzb`;
-  }
-  if (country !== "") {
-    urlAtom = `${urlAtom}/${country.toLowerCase()}`;
-  }
+  // if (country === "") {
+  //   urlAtom = `${ApiUrl}/uzb`;
+  // }
+  // if (country !== "") {
+    urlAtom = `${urlAtom}/${country}`;
+  // }
   if (page.has(country) && page.get(country) !== 0) {
     urlAtom = `${urlAtom}?page=${page.get(country)}`;
   }
   return urlAtom;
 }, "apiUrlAtom");
 
-export const fetchData = reatomAsync(async (ctx) => {
-  const url = ctx.get(apiUrlAtom);
-  const response = await fetch(url);
-  console.log("fetchData", url);
-  if (!response.ok) {
-    throw new Error("Data Not Found");
-  }
-  return await response.json();
-}, "fetchData").pipe(
-  withErrorAtom((ctx, error) => "Data Not Found"),
-  withDataAtom(new Map(), (ctx, data, state) => {
-    // columnsAtom(ctx, data.columns);
-    // selectedColumnsAtom(ctx, new Map([[ctx.get(countryAtom), [0, 1, 2]]]));
-    return new Map([...state, [ctx.get(countryAtom), data]]);
-  }),
-);
+export const paginationAtom = atom({country: "", pages: []} ,"paginationAtom");
 
-// export const columnsAtom = atom((ctx) => ctx.spy(fetchData.dataAtom)?.columns || [1, 2, 3], "columnsAtom");
-
-export const paginationAtom = atom((ctx) => {
-  const country = ctx.spy(countryAtom);
-  const pages = ctx.spy(fetchData.dataAtom).get(country)?.pages;
-  const page = ctx.spy(pageAtom).get(country);
+export const updatePages = action((ctx, pages: number, page: number, country: Countries) => {
+  // const country = ctx.get(countryAtom);
+  // const pages = ctx.spy(fetchData.dataAtom).get(country)?.pages;
+  // const allData = ctx.get(fetchData.dataAtom);
+  // const country = ctx.get(countryAtom);
+  // const pages = allData.get(country)?.pages;
+  // const page = ctx.get(pageAtom).get(country);
   if (!pages || !page) {
     return { country, pages: [] };
   }
@@ -126,9 +117,52 @@ export const paginationAtom = atom((ctx) => {
     } else if (page >= pages - 2) {
       pagesArray = [1, "...", pages - 3, pages - 2, pages - 1, pages];
     }
-    return { country, pages: pagesArray };
+    paginationAtom(ctx, { country, pages: pagesArray });
   }
-}, "paginationAtom");
+}, "updatePages");
+
+
+export const fetchData = reatomAsync(async (ctx) => {
+  const page = ctx.get(pageAtom);
+  const country = ctx.get(countryAtom);
+
+  let url = `${ApiUrl}`;
+
+  // if (country === "") {
+  //   urlAtom = `${ApiUrl}/uzb`;
+  // }
+  // if (country !== "") {
+    url = `${url}/${country}`;
+  // }
+  if (page.has(country) && page.get(country) !== 0) {
+    url = `${url}?page=${page.get(country)}`;
+  }
+  // const url = ctx.get(apiUrlAtom);
+  console.log("fetchData", url);
+  const response = await fetch(url, ctx.controller);
+  if (!response.ok) {
+    throw new Error("Data Not Found");
+  }
+  return await response.json();
+}, "fetchData").pipe(
+  withErrorAtom(() => "Data Not Found"),
+  withDataAtom(new Map(), (ctx, data, state) => {
+    return new Map([...state, [ctx.get(countryAtom), data]]);
+  }),
+  withAbort()
+);
+
+fetchData.onFulfill.onCall((ctx) => {
+  const allData = ctx.get(fetchData.dataAtom);
+  const country = ctx.get(countryAtom);
+  const pages = allData.get(country)?.pages;
+  let page = Number(ctx.get(pageAtom).get(country));
+  if (!page || typeof page == "undefined") {
+    page = 1;
+  }
+  updatePages(ctx, pages, page, country); 
+})
+
 
 onConnect(fetchData, (ctx) => {
   fetchData(ctx);

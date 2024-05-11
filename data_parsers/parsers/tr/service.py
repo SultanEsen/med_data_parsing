@@ -2,11 +2,15 @@ import logging
 from datetime import datetime
 from pathlib import Path
 from pprint import pprint
+import logging
 
 from parsers.tr.turk import TURKCrawler
 from parsers.tr.turk_xlsx import TURKFileParser
 from parsers.tr.repository import DocumentRepo, DataRepo
 from utils import get_latest_files
+
+
+logger = logging.getLogger(__name__)
 
 
 class TURKService:
@@ -49,6 +53,7 @@ class TURKService:
         #         continue
         assert self.tables.shape[1] == 3, f"Number of columns in file {self.file} is incorrect"
         await self.data_repo.add(self.tables)
+        logger.info(f"Saved {self.tables.shape[0]} rows")
 
     async def parse(self):
         # await self.download_file()

@@ -47,8 +47,8 @@ class KazService:
                 if len(page) == 0:
                     # if no tables on page
                     continue
-                if ind > 3:
-                    break
+                # if ind > 3:
+                #     break
                 # if headingd not set yet and there are tables on page
                 if len(page[0]) != 0 and not self.headings:
                     self.headings = self.process_headings(page[0][0])

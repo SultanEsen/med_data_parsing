@@ -1,20 +1,19 @@
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
-from pprint import pprint
 
-from database import Database
-from models.uzb import IDataResponse as UZBDataResponse
-from models.turk import IDataResponse as TurkDataResponse
-from models.kaz import IDataResponse as KazDataResponse
+from src.database import Database
+from src.models.uzb import IDataResponse as UZBDataResponse
+from src.models.turk import IDataResponse as TurkDataResponse
+from src.models.kaz import IDataResponse as KazDataResponse
 
 
 app = FastAPI()
 # app.mount("/static", StaticFiles(directory="static"), name="static")
 # templates = Jinja2Templates(directory="templates")
-db_path = Path(__file__).parent.parent / "db.sqlite3"
+db_path = Path(__file__).parent.parent.parent / "db.sqlite3"
 database = Database(db_path)
-origins = ["http://localhost:5173", "http://localhost:4173", "https://medd.zzdev.ru"]
+origins = ["http://localhost:5173", "http://localhost:4173", "http://medical.zzdev.ru"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -138,7 +137,7 @@ async def russian_data(page: int = 1):
     }
 
 
-@app.get("/blr", status_code=404)
+@app.get("/by", status_code=404)
 async def belarus_data(page: int = 1):
     """Эндпоинт для данных по Беларуси"""
     return {}

@@ -1,32 +1,30 @@
 import React from "react";
 import { reatomComponent } from "@reatom/npm-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { countries, countryAtom, updateCountry } from "../model";
-
+import { countries, updateCountry, type Countries } from "../model";
 
 const CountriesList = reatomComponent(({ ctx }) => {
-  const changeCountry = (e: React.MouseEvent) => {
-    const country = (e.target as HTMLButtonElement).dataset.country;
+  const changeCountry = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const country = e.currentTarget.dataset.country;
     if (country) {
-      updateCountry(ctx, country);
+      updateCountry(ctx, country as Countries);
     }
   };
 
   return (
-    <div className="buttons-list">
-      <ul id="countries">
-        {countries.map((c) => (
-          <li key={c.path}>
-            <button
-              className={ctx.get(countryAtom).toLowerCase() === c.name ? "active" : ""}
-              data-country={c.name}
-              onClick={changeCountry}
-            >
+    <div className="w-fit p-2 m-1">
+      <Tabs defaultValue={countries[0].name} className="w-[400px]">
+        <TabsList>
+          {countries.map((c) => (
+            <TabsTrigger onClick={changeCountry} key={c.path} data-country={c.name} value={c.name}>
               {c.label}
-            </button>
-          </li>
-        ))}
-      </ul>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        {/* <TabsContent value="account">Make changes to your account here.</TabsContent> */}
+        {/* <TabsContent value="password">Change your password here.</TabsContent> */}
+      </Tabs>
     </div>
   );
 }, "CountriesList");

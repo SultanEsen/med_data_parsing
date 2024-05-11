@@ -80,6 +80,7 @@ class UZBService:
                 'Текущая розничная цена'
                 ]]
             await self.data_repo.add(data.values.tolist())
+            logger.info(f"Saved {data.shape[0]} rows")
 
     async def parse(self):
         # await self.download_file()

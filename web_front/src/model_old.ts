@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import { action, atom, batch, createCtx } from '@reatom/core'
 
 export const ctx = createCtx()
