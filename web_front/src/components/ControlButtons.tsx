@@ -13,6 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import {
   fetchData,
@@ -34,7 +35,6 @@ const ControlButtons = reatomComponent(({ ctx }) => {
   };
 
   return (
-    // {/* <div className="columns"> */}
     <div className="flex gap-2">
       <Button>Search</Button>
       <Dialog>
@@ -46,23 +46,21 @@ const ControlButtons = reatomComponent(({ ctx }) => {
             <DialogTitle>
               Select columns for {countries.filter((c) => c.name === country)?.[0]?.label}
             </DialogTitle>
-            {/* <DialogDescription> */}
-            {/*   Anyone who has this link will be able to view this. */}
-            {/* </DialogDescription> */}
           </DialogHeader>
           <div className="flex flex-col gap-2">
-            {columns && columns.map((column, ind: number) => (
-              <label key={column} className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  key={column}
-                  value={ind}
-                  onChange={selectColumns}
-                  checked={selectedColsInd.includes(ind)}
-                />
-                {column}
-              </label>
-            ))}
+            {columns &&
+              columns.map((column, ind: number) => (
+                <label key={column} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    key={column}
+                    value={ind}
+                    onChange={selectColumns}
+                    checked={selectedColsInd.includes(ind)}
+                  />
+                  {column}
+                </label>
+              ))}
           </div>
           <DialogFooter className="sm:justify-start">
             <DialogClose asChild>
@@ -71,31 +69,13 @@ const ControlButtons = reatomComponent(({ ctx }) => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <Tabs defaultValue="raw">
+        <TabsList>
+          <TabsTrigger value="raw">Raw Data</TabsTrigger>
+          <TabsTrigger value="prep">Prepared</TabsTrigger>
+        </TabsList>
+      </Tabs>
     </div>
-    // {/* </div> */}
-      // {/* <button className="columns-btn" onClick={() => setShowModal(!showModal)}> */}
-      // {/*   Columns */}
-      // {/* </button> */}
-      // {/* <div className={`columns-modal ${showModal ? "show" : ""}`}> */}
-      // {/*   <div className="columns-container"> */}
-      // {/*     {columns.map((column, ind: number) => ( */}
-      // {/*       <label> */}
-      // {/*         <input */}
-      // {/*           type="checkbox" */}
-      // {/*           key={column} */}
-      // {/*           value={ind} */}
-      // {/*           onChange={selectColumns} */}
-      // {/*           checked={selectedColsInd.includes(ind)} */}
-      // {/*         /> */}
-      // {/*         {column} */}
-      // {/*       </label> */}
-      // {/*     ))} */}
-      // {/*     <button className="columns-btn" onClick={() => setShowModal(!showModal)}> */}
-      // {/*       Close */}
-      // {/*     </button> */}
-      // {/*   </div> */}
-      // {/* </div> */}
-    // </div>
   );
 });
 

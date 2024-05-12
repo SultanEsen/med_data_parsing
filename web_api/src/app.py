@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
+import asyncio
 from pathlib import Path
 
 from src.database import Database

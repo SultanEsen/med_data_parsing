@@ -9,7 +9,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import { fetchData, countryAtom, selectedColumnsAtom } from "../model";
 
@@ -19,25 +20,37 @@ const DataTable = reatomComponent(({ ctx }) => {
   const selectedColsInd = ctx.spy(selectedColumnsAtom).get(country);
   const colNames = ctx.spy(fetchData.dataAtom).get(country)?.columns;
 
+  if (ctx.spy(fetchData.pendingAtom)) {
+    return (
+      <div className="space-y-2">
+        <Skeleton className="w-full h-8" />
+        <Skeleton className="w-full h-8" />
+        <Skeleton className="w-full h-8" />
+      </div>
+    );
+  }
+
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          {colNames && selectedColsInd.map((col) => (
-            <TableHead key={col}>{colNames[col].replace(/_/g, " ")}</TableHead>
-          ))}
+          {colNames &&
+            selectedColsInd.map((col) => (
+              <TableHead key={col}>{colNames[col].replace(/_/g, " ")}</TableHead>
+            ))}
         </TableRow>
       </TableHeader>
       <TableBody>
-        {dataRows && colNames && dataRows?.map((row) => (
-          <TableRow key={row.id}>
-            {selectedColsInd.map((col) => (
-              <TableCell key={col}>{row[colNames[col]]}</TableCell>
-            ))}
-          </TableRow>
-        ))}
+        {dataRows &&
+          colNames &&
+          dataRows?.map((row) => (
+            <TableRow key={row.id}>
+              {selectedColsInd.map((col) => (
+                <TableCell key={col}>{row[colNames[col]]}</TableCell>
+              ))}
+            </TableRow>
+          ))}
       </TableBody>
-
     </Table>
     // {/* <table> */}
     // {/*   <thead> */}
