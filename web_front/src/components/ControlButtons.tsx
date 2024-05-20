@@ -22,12 +22,14 @@ import {
   countryAtom,
   countries,
 } from "../model";
+import { dictionaryAtom } from "@/translation-model";
 
 const ControlButtons = reatomComponent(({ ctx }) => {
   const [showModal, setShowModal] = useState(false);
   const selectedColsInd = ctx.spy(selectedColumnsAtom).get(ctx.get(countryAtom));
   const country = ctx.spy(countryAtom);
   const columns = ctx.spy(fetchData.dataAtom).get(country)?.columns;
+  const countryName = countries.find((c) => c.name === country)?.label;
 
   const selectColumns = (event: React.ChangeEvent<HTMLInputElement>) => {
     const target = event.target as HTMLInputElement;
@@ -36,15 +38,15 @@ const ControlButtons = reatomComponent(({ ctx }) => {
 
   return (
     <div className="flex gap-2">
-      <Button>Search</Button>
+      <Button>{ctx.spy(dictionaryAtom)["Search"]}</Button>
       <Dialog>
         <DialogTrigger asChild>
-          <Button>Select Columns</Button>
+          <Button>{ctx.spy(dictionaryAtom)["Select columns"]}</Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              Select columns for {countries.filter((c) => c.name === country)?.[0]?.label}
+              {ctx.spy(dictionaryAtom)["Select columns for"]} {ctx.spy(dictionaryAtom)[countryName]}
             </DialogTitle>
           </DialogHeader>
           <div className="flex flex-col gap-2">
@@ -58,7 +60,7 @@ const ControlButtons = reatomComponent(({ ctx }) => {
                     onChange={selectColumns}
                     checked={selectedColsInd.includes(ind)}
                   />
-                  {column}
+                  {ctx.spy(dictionaryAtom)[column]}
                 </label>
               ))}
           </div>
@@ -71,8 +73,8 @@ const ControlButtons = reatomComponent(({ ctx }) => {
       </Dialog>
       <Tabs defaultValue="raw">
         <TabsList>
-          <TabsTrigger value="raw">Raw Data</TabsTrigger>
-          <TabsTrigger value="prep">Prepared</TabsTrigger>
+          <TabsTrigger value="raw">{ctx.spy(dictionaryAtom)["Raw Data"]}</TabsTrigger>
+          <TabsTrigger value="prep">{ctx.spy(dictionaryAtom)["Prepared"]}</TabsTrigger>
         </TabsList>
       </Tabs>
     </div>

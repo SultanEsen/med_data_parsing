@@ -2,13 +2,14 @@ import React from "react";
 import { reatomComponent } from "@reatom/npm-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { countries, countryAtom, type Countries } from "../model";
+import { countries, countryAtom, type CountryType } from "../model";
+import { dictionaryAtom } from "@/translation-model";
 
 const CountriesList = reatomComponent(({ ctx }) => {
   const changeCountry = (e: React.MouseEvent<HTMLButtonElement>) => {
     const country = e.currentTarget.dataset.country;
     if (country) {
-      countryAtom(ctx, country as Countries);
+      countryAtom(ctx, country as CountryType);
     }
   };
 
@@ -18,7 +19,7 @@ const CountriesList = reatomComponent(({ ctx }) => {
         <TabsList>
           {countries.map((c) => (
             <TabsTrigger onClick={changeCountry} key={c.path} data-country={c.name} value={c.name}>
-              {c.label}
+              {ctx.spy(dictionaryAtom)?.[c.label]}
             </TabsTrigger>
           ))}
         </TabsList>

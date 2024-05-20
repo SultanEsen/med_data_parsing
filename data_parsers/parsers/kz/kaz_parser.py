@@ -19,6 +19,7 @@ class KazFileParser:
     def read_file(cls, path):
         pdf = pdfplumber.open(path)
         logger.info(f"Found {len(pdf.pages)} tables")
+        yield len(pdf.pages)
         for page in pdf.pages:
             yield page.extract_tables()
             page.flush_cache()

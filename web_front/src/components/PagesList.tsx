@@ -2,15 +2,19 @@ import { useState } from "react";
 import { reatomComponent } from "@reatom/npm-react";
 
 import { pageAtom, countryAtom, updatePage, fetchData } from "../model";
+import { dictionaryAtom } from "@/translation-model";
 import { Button } from "@/components/ui/button";
 
 const PagesList = reatomComponent(({ ctx }) => {
-  const currentPage = ctx.spy(pageAtom).get(ctx.get(countryAtom));
+  let currentPage = ctx.spy(pageAtom).get(ctx.get(countryAtom));
+  if (currentPage === undefined) {
+    currentPage = 1;
+  }
   const totalPages = ctx.spy(fetchData.dataAtom).get(ctx.get(countryAtom))?.pages;
   const [editPage, setEditPage] = useState(false);
-  const [newPage, setNewPage] = useState<number>(currentPage);
+  const [newPage, setNewPage] = useState<number>(1);
 
-  const changePage = (page: string) => {
+  const changePage = (page: number) => {
     if (page === null) {
       return;
     }
@@ -27,7 +31,7 @@ const PagesList = reatomComponent(({ ctx }) => {
           <input
             className="w-20"
             type="number"
-            onChange={(e) => setNewPage(e.target.value)}
+            onChange={(e) => setNewPage(Number(e.target.value))}
             onKeyUp={(e: React.KeyboardEvent) => {
               if (e.key === "Enter") changePage(newPage);
             }}
@@ -35,38 +39,22 @@ const PagesList = reatomComponent(({ ctx }) => {
             autoFocus
           />
           <Button variant="outline" onClick={() => changePage(newPage)}>
-            GO
+            {ctx.spy(dictionaryAtom)?.["go"]}
           </Button>
         </div>
       ) : (
         <div className="flex gap-2 items-center justify-center">
           <Button variant="outline" onClick={() => updatePage(ctx, currentPage - 1)}>
-            prev
+            {ctx.spy(dictionaryAtom)?.["prev"]}
           </Button>
           <span className="cursor-pointer w-[100px] text-center" onClick={() => setEditPage(true)}>
             {currentPage} / {totalPages}
           </span>
           <Button variant="outline" onClick={() => updatePage(ctx, currentPage + 1)}>
-            next
+            {ctx.spy(dictionaryAtom)?.["next"]}
           </Button>
         </div>
       )}
-      {/* <ul id="pagination"> */}
-      {/*   {ctx.spy(paginationAtom)?.pages?.map((page, idx) => ( */}
-      {/*     <li key={page+idx}> */}
-      {/*       {page === "..." ? ( */}
-      {/*         <span>{page}</span> */}
-      {/*       ) : ( */}
-      {/*         <button */}
-      {/*           className={ctx.get(pageAtom).get(ctx.get(countryAtom)) === page ? "active" : ""} */}
-      {/*           onClick={() => updatePage(ctx, page)} */}
-      {/*         > */}
-      {/*           {page} */}
-      {/*         </button> */}
-      {/*       )} */}
-      {/*     </li> */}
-      {/*   ))} */}
-      {/* </ul> */}
     </div>
   );
 }, "Pagination");

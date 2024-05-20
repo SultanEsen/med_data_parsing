@@ -23,16 +23,16 @@ async def main():
     # crawl and parse
     service = UZBService(database)
     # logger.info("Starting UZB")
-    # await service.parse()
+    await service.parse()
     # pprint(await service.data_repo.list())
 
     service = KazService(database)
     # logger.info("Starting KAZ")
-    # await service.parse()
+    await service.parse()
 
     service = TURKService(database)
     # logger.info("Starting TURK")
-    # await service.parse()
+    await service.parse()
     # print("Count: ", await service.data_repo.count())
 
     service = RuService(database)

@@ -33,7 +33,7 @@ const DataTable = reatomComponent(({ ctx }) => {
   return (
     <Table>
       <TableHeader>
-        <TableRow>
+        <TableRow className="bg-slate-100 text-slate-700">
           {colNames &&
             selectedColsInd.map((col) => (
               <TableHead key={col}>{colNames[col].replace(/_/g, " ")}</TableHead>
@@ -44,7 +44,7 @@ const DataTable = reatomComponent(({ ctx }) => {
         {dataRows &&
           colNames &&
           dataRows?.map((row) => (
-            <TableRow key={row.id}>
+            <TableRow key={row.id} className="odd:bg-white even:bg-slate-50">
               {selectedColsInd.map((col) => (
                 <TableCell key={col}>{row[colNames[col]]}</TableCell>
               ))}

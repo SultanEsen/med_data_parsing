@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 from pathlib import Path
 import logging
+from time import perf_counter
 
 from parsers.ru.ru_crawler import RuCrawler
 from parsers.ru.ru_parser import RuFileParser
@@ -63,11 +64,25 @@ class RuService:
         ]]
         self.tables = df
 
+    def divide_into_chunks(self, df, n):
+        # looping till length of data
+        for i in range(0, len(df), n):
+            start = perf_counter()
+            yield df.iloc[i:i + n]
+            end = perf_counter()
+            logger.info(f"{(end - start) * 1000} ms")
+
     async def save_data(self):
         # assert table.shape[1] == 11, f"Number of columns in file {self.file} is incorrect"
-        logger.info(self.headers)
+        # logger.info(self.headers)
         self.process_columns(self.tables)
-        await self.data_repo.add(self.tables)
+        if len(self.tables) > 5_000:
+            for ind, chunk in enumerate(self.divide_into_chunks(self.tables, 100)):
+                logger.info(f"Saving chunk {ind}")
+                await self.data_repo.add(chunk)
+        else:
+            await self.data_repo.add(self.tables)
+        # await self.data_repo.add(self.tables)
 
     async def parse(self):
         # await self.download_file()

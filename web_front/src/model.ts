@@ -8,15 +8,15 @@ import {
   connectLogger,
   isShallowEqual,
 } from "@reatom/framework";
-import { updatePages } from "./pagination-model";
 
 
 export const ctx = createCtx();
 connectLogger(ctx);
 
-export type Countries = "uzb" | "kaz" | "rus" | "blr" | "ukr" | "turk" | "mld";
+export type CountryType = "uzb" | "kaz" | "rus" | "blr" | "ukr" | "turk" | "mld";
+export type CountryName = "Uzbekistan" | "Kazakhstan" | "Russia" | "Belarus" | "Ukraine" | "Turkey" | "Moldova";
 
-export const countries: { name: Countries; path: string; label: string }[] = [
+export const countries: { name: CountryType; path: string; label: CountryName }[] = [
   { name: "uzb", path: "/uzb", label: "Uzbekistan" },
   { name: "kaz", path: "/kaz", label: "Kazakhstan" },
   { name: "rus", path: "/rus", label: "Russia" },
@@ -35,12 +35,12 @@ export const redirect = action((ctx, path: string) => {
   window.location.pathname = path;
 });
 
-export const countryAtom = atom<Countries>("uzb", "countryAtom");
-export const pageAtom = atom(new Map<Countries, number>(countries.map((country) => [country.name, 1])), "pageAtom");
+export const countryAtom = atom<CountryType>("uzb", "countryAtom");
+export const pageAtom = atom(new Map<CountryType, number>(countries.map((country) => [country.name, 1])), "pageAtom");
 
 
 export const selectedColumnsAtom = atom(
-  new Map<Countries, number[]>(countries.map((country) => [country.name, [0, 1, 2]])),
+  new Map<CountryType, number[]>(countries.map((country) => [country.name, [0, 1, 2]])),
   "selectedColumnsAtom",
 );
 
@@ -109,18 +109,6 @@ export const updatePage = action((ctx, page: number) => {
     pageAtom(ctx, newState);
   }
 });
-
-// fetchData.onFulfill.onCall((ctx) => {
-//   const allData = ctx.get(fetchData.dataAtom);
-//   const country = ctx.get(countryAtom);
-//   const pages = allData.get(country)?.pages;
-//   let page = Number(ctx.get(pageAtom).get(country));
-//   if (!page || typeof page == "undefined") {
-//     page = 1;
-//   }
-  // updatePages(ctx, pages, page, country); 
-// })
-
 
 onConnect(fetchData, (ctx) => {
   fetchData(ctx);
