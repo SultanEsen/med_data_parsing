@@ -4,6 +4,7 @@ class Queries:
         CREATE TABLE IF NOT EXISTS latest_documents (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             url TEXT,
+            country TEXT,
             created_at DATETIME
         )
     """
@@ -55,5 +56,21 @@ class Queries:
             ath_code TEXT,
             amount INTEGER,
             limit_price REAL
+        )
+    """
+    DROP_MOLDAVIA_DATA_TABLE = "DROP TABLE IF EXISTS moldova_data"
+    CREATE_MOLDAVIA_DATA_TABLE = """
+        CREATE TABLE IF NOT EXISTS moldova_data (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            trade_mark_name TEXT,
+            medical_form TEXT,
+            dosage_form TEXT,
+            volume TEXT,
+            producer_country TEXT,
+            producer TEXT,
+            ath_code TEXT,
+            mnn TEXT,
+            price REAL,
+            currency TEXT
         )
     """

@@ -5,9 +5,10 @@ from pathlib import Path
 
 from parsers.database import Database
 from parsers.uzb.service import UZBService
-from parsers.kz.service import KazService
-from parsers.tr.service import TURKService
-from parsers.ru.service import RuService
+from parsers.kaz.service import KazService
+from parsers.turk.service import TURKService
+from parsers.rus.service import RuService
+from parsers.mld.service import MoldovaService
 
 
 logger = logging.getLogger(__name__)
@@ -23,20 +24,24 @@ async def main():
     # crawl and parse
     service = UZBService(database)
     # logger.info("Starting UZB")
-    await service.parse()
+    # await service.parse()
     # pprint(await service.data_repo.list())
 
     service = KazService(database)
     # logger.info("Starting KAZ")
-    await service.parse()
+    # await service.parse()
 
     service = TURKService(database)
     # logger.info("Starting TURK")
-    await service.parse()
+    # await service.parse()
     # print("Count: ", await service.data_repo.count())
 
     service = RuService(database)
     logger.info("Starting RUS")
+    # await service.parse()
+
+    service = MoldovaService(database)
+    logger.info("Starting MOLDOVA")
     await service.parse()
 
 if __name__ == "__main__":

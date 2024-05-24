@@ -4,9 +4,9 @@ from pathlib import Path
 import logging
 from time import perf_counter
 
-from parsers.ru.ru_crawler import RuCrawler
-from parsers.ru.ru_parser import RuFileParser
-from parsers.ru.repository import DocumentRepo, DataRepo
+from parsers.rus.ru_crawler import RuCrawler
+from parsers.rus.ru_parser import RuFileParser
+from parsers.rus.repository import DocumentRepo, DataRepo
 from utils import get_latest_files
 
 logger = logging.getLogger(__name__)

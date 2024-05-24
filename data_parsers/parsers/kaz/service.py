@@ -1,6 +1,6 @@
-from parsers.kz.kaz_crawler import KazCrawler
-from parsers.kz.kaz_parser import KazFileParser
-from parsers.kz.repository import DocumentRepo, DataRepo
+from parsers.kaz.kaz_crawler import KazCrawler
+from parsers.kaz.kaz_parser import KazFileParser
+from parsers.kaz.repository import DocumentRepo, DataRepo
 from utils import get_latest_files
 
 from pathlib import Path

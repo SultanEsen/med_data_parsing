@@ -4,9 +4,9 @@ from pathlib import Path
 from pprint import pprint
 import logging
 
-from parsers.tr.turk import TURKCrawler
-from parsers.tr.turk_xlsx import TURKFileParser
-from parsers.tr.repository import DocumentRepo, DataRepo
+from parsers.turk.turk import TURKCrawler
+from parsers.turk.turk_xlsx import TURKFileParser
+from parsers.turk.repository import DocumentRepo, DataRepo
 from utils import get_latest_files
 
 
