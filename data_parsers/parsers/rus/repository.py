@@ -2,36 +2,7 @@ from datetime import datetime
 import logging
 
 
-class DocumentRepo:
-    def __init__(self, session):
-        self.session = session
-
-    async def add(self, url):
-        item = await self.session.execute(
-            """
-            INSERT INTO latest_documents (url, created_at) VALUES (?, ?)
-            """,
-            (url, datetime.utcnow())
-        )
-
-    async def get(self, url):
-        item = await self.session.fetch(
-            """
-            SELECT * FROM latest_documents WHERE url = ?
-            """,
-            (url,),
-            fetch_type="one"
-        )
-        return item
-
-    async def list(self):
-        items = await self.session.fetch(
-            """
-            SELECT * FROM latest_documents
-            """,
-            fetch_type="all"
-        )
-        return items
+logger = logging.getLogger(__name__)
 
 
 class DataRepo:
@@ -39,18 +10,21 @@ class DataRepo:
         self.session = session
 
     async def add(self, df):
-        for _, row in df.iterrows():
+        for i, row in df.iterrows():
+            # record = await self.session.fetch(
+            #     "SELECT * FROM russia_data WHERE mnn = $1 AND medicine_info = $2 and amount = $3",
+            #     params=(row.iloc[0], row.iloc[2], row.iloc[5]),
+            # )
+            logger.info(f"Row: {i}")
             await self.session.execute(
                 """
                 INSERT INTO russia_data
                 (mnn, trade_mark_name,
-                 medicine_info, producer, ath_code, amount, 
+                 medicine_info, producer, ath_code, amount,
                  limit_price) VALUES
-                (?, ?, ?, ?, ?, ?, ?)
+                ($1, $2, $3, $4, $5, $6, $7)
                 """,
-                # The number of columns in the table is 11,
-                # we are sving only 10 for now
-                row
+                tuple(row.values)
             )
 
     async def count(self):
@@ -79,3 +53,34 @@ class DataRepo:
             fetch_type="all"
         )
         return items
+
+# class DocumentRepo:
+#     def __init__(self, session):
+#         self.session = session
+
+#     async def add(self, url):
+#         item = await self.session.execute(
+#             """
+#             INSERT INTO latest_documents (url, created_at) VALUES (?, ?)
+#             """,
+#             (url, datetime.utcnow())
+#         )
+
+#     async def get(self, url):
+#         item = await self.session.fetch(
+#             """
+#             SELECT * FROM latest_documents WHERE url = ?
+#             """,
+#             (url,),
+#             fetch_type="one"
+#         )
+#         return item
+
+#     async def list(self):
+#         items = await self.session.fetch(
+#             """
+#             SELECT * FROM latest_documents
+#             """,
+#             fetch_type="all"
+#         )
+#         return items

@@ -2,6 +2,8 @@ import asyncio
 import logging
 from pprint import pprint
 from pathlib import Path
+from dotenv import load_dotenv
+from os import getenv
 
 from parsers.database import Database
 from parsers.uzb.service import UZBService
@@ -16,9 +18,10 @@ logger = logging.getLogger(__name__)
 
 async def main():
     # create database
-    db_path = Path(__file__).parent.parent / "db.sqlite3"
+    # db_path = Path(__file__).parent.parent / "db.sqlite3"
     # print(db_path)
-    database = Database(db_path)
+    load_dotenv(Path(__file__).parent.parent / ".env")
+    database = Database(getenv("DATABASE_URL"))
     await database.create_tables()
 
     # crawl and parse
@@ -38,11 +41,12 @@ async def main():
 
     service = RuService(database)
     logger.info("Starting RUS")
-    # await service.parse()
+    await service.parse()
 
     service = MoldovaService(database)
-    logger.info("Starting MOLDOVA")
-    await service.parse()
+    # logger.info("Starting MOLDOVA")
+    # await service.parse()
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)

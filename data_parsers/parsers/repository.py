@@ -9,10 +9,12 @@ class DocumentRepo:
     async def add(self, country, url):
         item = await self.session.execute(
             """
-            INSERT INTO latest_documents (url, created_at) VALUES (?, ?)
+            INSERT INTO latest_documents
+            (url, country, created_at) VALUES (?, ?, ?)
             """,
-            (url, datetime.utcnow())
+            (url, country, datetime.now(datetime.UTC))
         )
+        return item
 
     async def get(self, url):
         item = await self.session.fetch(
@@ -32,5 +34,3 @@ class DocumentRepo:
             fetch_type="all"
         )
         return items
-
-

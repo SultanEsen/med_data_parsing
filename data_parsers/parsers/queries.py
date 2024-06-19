@@ -2,16 +2,16 @@ class Queries:
     VACUUM = "VACUUM"
     CREATE_LATEST_DOCUMENTS_TABLE = """
         CREATE TABLE IF NOT EXISTS latest_documents (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id serial PRIMARY KEY,
             url TEXT,
             country TEXT,
-            created_at DATETIME
+            created_at DATE
         )
     """
     DROP_UZBEKISTAN_DATA_TABLE = "DROP TABLE IF EXISTS uzbekistan_data"
     CREATE_UZBEKISTAN_DATA_TABLE = """
         CREATE TABLE IF NOT EXISTS uzbekistan_data (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id serial PRIMARY KEY,
             package_id INTEGER,
             trade_mark_name TEXT,
             mnn TEXT,
@@ -27,7 +27,7 @@ class Queries:
     DROP_TURKEY_DATA_TABLE = "DROP TABLE IF EXISTS turkey_data"
     CREATE_TURKEY_DATA_TABLE = """
         CREATE TABLE IF NOT EXISTS turkey_data (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id serial PRIMARY KEY,
             medicine_info TEXT,
             company_name TEXT,
             price REAL
@@ -36,7 +36,7 @@ class Queries:
     DROP_KAZAKHSTAN_DATA_TABLE = "DROP TABLE IF EXISTS kazakhstan_data"
     CREATE_KAZAKHSTAN_DATA_TABLE = """
         CREATE TABLE IF NOT EXISTS kazakhstan_data (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id serial PRIMARY KEY,
             trade_mark_name TEXT,
             mnn TEXT,
             dosage_form TEXT,
@@ -48,7 +48,7 @@ class Queries:
     DROP_RUSSIA_DATA_TABLE = "DROP TABLE IF EXISTS russia_data"
     CREATE_RUSSIA_DATA_TABLE = """
         CREATE TABLE IF NOT EXISTS russia_data (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id serial PRIMARY KEY,
             mnn TEXT,
             trade_mark_name TEXT,
             medicine_info TEXT,
@@ -61,7 +61,7 @@ class Queries:
     DROP_MOLDAVIA_DATA_TABLE = "DROP TABLE IF EXISTS moldova_data"
     CREATE_MOLDAVIA_DATA_TABLE = """
         CREATE TABLE IF NOT EXISTS moldova_data (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id serial PRIMARY KEY,
             trade_mark_name TEXT,
             medical_form TEXT,
             dosage_form TEXT,
