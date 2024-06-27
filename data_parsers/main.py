@@ -15,7 +15,6 @@ from parsers.mld.service import MoldovaService
 
 logger = logging.getLogger(__name__)
 
-
 async def main():
     # create database
     # db_path = Path(__file__).parent.parent / "db.sqlite3"
@@ -31,8 +30,8 @@ async def main():
     # pprint(await service.data_repo.list())
 
     service = KazService(database)
-    # logger.info("Starting KAZ")
-    # await service.parse()
+    logger.info("Starting KAZ")
+    await service.parse()
 
     service = TURKService(database)
     # logger.info("Starting TURK")
@@ -40,8 +39,8 @@ async def main():
     # print("Count: ", await service.data_repo.count())
 
     service = RuService(database)
-    logger.info("Starting RUS")
-    await service.parse()
+    # logger.info("Starting RUSSIA")
+    # await service.parse()
 
     service = MoldovaService(database)
     # logger.info("Starting MOLDOVA")

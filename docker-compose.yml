@@ -1,13 +1,35 @@
-version: '3.8'
-
 services:
-  web:
-    build: ./web_api
-    ports:
-      - "8080:8080"
+  database:
+    image: postgres:16-alpine
     volumes:
-      - .:/src
-      - sqlite_data:/var/lib/sqlite
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    env_file:
+      - .env
+
+  # web_api:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   depends_on:
+  #     - database
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+
+  parsers:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - database
+    volumes:
+      - .:/app
+    command: python3 /app/data_parsers/main.py
+
+    
 
 volumes:
-  sqlite_data:
+  postgres_data:

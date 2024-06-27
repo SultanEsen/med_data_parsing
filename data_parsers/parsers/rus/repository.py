@@ -1,6 +1,4 @@
-from datetime import datetime
 import logging
-
 
 logger = logging.getLogger(__name__)
 
@@ -24,8 +22,22 @@ class DataRepo:
                  limit_price) VALUES
                 ($1, $2, $3, $4, $5, $6, $7)
                 """,
-                tuple(row.values)
+                tuple(row.values),
             )
+
+    async def copy_from_csv(self, path):
+        logger.info(f"Path: {path}")
+        await self.session.execute(
+            f"""
+            COPY russia_data(
+                mnn, trade_mark_name,
+                medicine_info, producer, ath_code, amount,
+                limit_price
+            ) FROM {path}
+            WITH DELIMITER AS ','
+            CSV HEADER
+            """
+        )
 
     async def count(self):
         count = await self.session.fetch(
@@ -35,13 +47,13 @@ class DataRepo:
         )
         return count
 
-    async def get(self, id):
+    async def get(self, record_id):
         item = await self.session.fetch(
             """
             SELECT * FROM russia_data WHERE id = ?
             """,
-            (id,),
-            fetch_type="one"
+            (record_id,),
+            fetch_type="one",
         )
         return item
 
@@ -50,9 +62,10 @@ class DataRepo:
             """
             SELECT * FROM russia_data
             """,
-            fetch_type="all"
+            fetch_type="all",
         )
         return items
+
 
 # class DocumentRepo:
 #     def __init__(self, session):

@@ -20,10 +20,10 @@ class Database:
         await conn.execute(Queries.CREATE_UZBEKISTAN_DATA_TABLE)
         # await conn.execute(Queries.DROP_TURKEY_DATA_TABLE)
         await conn.execute(Queries.CREATE_TURKEY_DATA_TABLE)
-        # await conn.execute(Queries.DROP_KAZAKHSTAN_DATA_TABLE)
+        await conn.execute(Queries.DROP_KAZAKHSTAN_DATA_TABLE)
         await conn.execute(Queries.CREATE_KAZAKHSTAN_DATA_TABLE)
-        await conn.execute(Queries.DROP_RUSSIA_DATA_TABLE)
-        await conn.execute(Queries.CREATE_RUSSIA_DATA_TABLE)
+        # await conn.execute(Queries.DROP_RUSSIA_DATA_TABLE)
+        # await conn.execute(Queries.CREATE_RUSSIA_DATA_TABLE)
         # await conn.commit()
         logger.info("Created tables")
         await conn.close()
@@ -31,8 +31,8 @@ class Database:
     async def fetch(
         self,
         query: str,
-        number: int = 1,
         params: tuple = (),
+        number: int = 1,
     ):
         conn = await asyncpg.connect(self.path)
         async with conn.transaction():
