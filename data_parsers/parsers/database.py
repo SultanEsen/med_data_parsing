@@ -17,13 +17,13 @@ class Database:
         # await conn.execute(Queries.VACUUM)
         await conn.execute(Queries.CREATE_LATEST_DOCUMENTS_TABLE)
         # await conn.execute(Queries.DROP_UZBEKISTAN_DATA_TABLE)
-        await conn.execute(Queries.CREATE_UZBEKISTAN_DATA_TABLE)
+        # await conn.execute(Queries.CREATE_UZBEKISTAN_DATA_TABLE)
         # await conn.execute(Queries.DROP_TURKEY_DATA_TABLE)
         await conn.execute(Queries.CREATE_TURKEY_DATA_TABLE)
-        await conn.execute(Queries.DROP_KAZAKHSTAN_DATA_TABLE)
-        await conn.execute(Queries.CREATE_KAZAKHSTAN_DATA_TABLE)
+        # await conn.execute(Queries.DROP_KAZAKHSTAN_DATA_TABLE)
+        # await conn.execute(Queries.CREATE_KAZAKHSTAN_DATA_TABLE)
         # await conn.execute(Queries.DROP_RUSSIA_DATA_TABLE)
-        # await conn.execute(Queries.CREATE_RUSSIA_DATA_TABLE)
+        await conn.execute(Queries.CREATE_RUSSIA_DATA_TABLE)
         # await conn.commit()
         logger.info("Created tables")
         await conn.close()
@@ -90,3 +90,11 @@ class Database:
     #     async with asyncpg.connect(self.path) as conn:
     #         await conn.executemany(query, params)
             # await conn.commit()
+
+    async def copy_from_csv(self, table_name: str, path: str):
+        conn = await asyncpg.connect(self.path)
+        result = await conn.copy_to_table(
+            table_name,
+            source=path
+        )
+        return result

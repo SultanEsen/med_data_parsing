@@ -6,7 +6,8 @@ import pandas as pd
 
 from parsers.uzb.uzb import UZBCrawler
 from parsers.uzb.uzb_pdf import UZBFileParser
-from parsers.uzb.repository import DocumentRepo, DataRepo
+from parsers.uzb.repository import DataRepo
+from parsers.repository import DocumentRepo
 from utils import get_latest_files
 
 
@@ -31,7 +32,7 @@ class UZBService:
                 if not item:
                     logger.info("Downloading file ...")
                     self.crawler.load_document(urls)
-                    await self.repo.add(urls)
+                    await self.repo.add(country="uzb", url=urls)
 
     def parse_data(self):
         file = get_latest_files(UZBCrawler.DOCUMENTS_DIRECTORY)
@@ -46,16 +47,26 @@ class UZBService:
             for ind, page in enumerate(file):
                 if ind == 0:
                     self.headings = page[0][0]
+                    self.headings[0] = 'ИД упаковки'
+                    self.headings[7] = 'Предельная цена'
                     data = page[0][1:]
                 else:
                     data = page[0]
                 yield pd.DataFrame(data, columns=self.headings), ind
 
     def process_columns(self, df, ind):
+        logger.info(f"Processing table {df.columns}")
         df['ИД упаковки'] = df['ИД упаковки'].astype('int64')
         df['Валюта'] = df['Валюта'].astype('category')
         df['Предельная цена'] = df['Предельная цена'].str.replace(",", ".")
-        df['Предельная цена'] = df['Предельная цена'].astype('float')
+        df['Предельная цена'] = df['Предельная цена'].str.replace(" ", "")
+        df['Предельная цена'] = df['Предельная цена'].fillna(0).astype('float')
+        df['Оптовая цена'] = df['Оптовая цена'].str.replace(",", ".")
+        df['Оптовая цена'] = df['Оптовая цена'].str.replace(" ", "")
+        df['Оптовая цена'] = df['Оптовая цена'].fillna(0).astype('float')
+        df['Розничная цена'] = df['Розничная цена'].str.replace(",", ".")
+        df['Розничная цена'] = df['Розничная цена'].str.replace(" ", "")
+        df['Розничная цена'] = df['Розничная цена'].fillna(0).astype('float')
         df[['МНН', 'Упаковка ЛП']].apply(
             lambda x: x.str.replace("\n", " ").str.strip()
         )
@@ -76,13 +87,13 @@ class UZBService:
                 'Номер регистрации',
                 'Валюта',
                 'Предельная цена',
-                'Текущая оптовая цена',
-                'Текущая розничная цена'
+                'Оптовая цена',
+                'Розничная цена'
                 ]]
-            await self.data_repo.add(data.values.tolist())
+            await self.data_repo.add(data)
             logger.info(f"Saved {data.shape[0]} rows")
 
     async def parse(self):
-        # await self.download_file()
+        await self.download_file()
         self.parse_data()
         await self.save_data()

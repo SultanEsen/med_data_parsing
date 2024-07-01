@@ -3,8 +3,9 @@ from starlette.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 import asyncio
 from pathlib import Path
-from redis_om import get_redis_connection
 import logging
+from dotenv import load_dotenv
+from os import getenv
 
 from src.database import Database
 from src.models.uzb import IDataResponse as UZBDataResponse
@@ -16,10 +17,12 @@ from src.models.rus import RussiaData
 app = FastAPI()
 # app.mount("/static", StaticFiles(directory="static"), name="static")
 # templates = Jinja2Templates(directory="templates")
-db_path = Path(__file__).parent.parent.parent / "db.sqlite3"
-database = Database(db_path)
+# db_path = Path(__file__).parent.parent.parent / "db.sqlite3"
+# database = Database(db_path)
+load_dotenv(Path(__file__).parent.parent / ".env")
+database = Database(getenv("DATABASE_URL"))
 origins = ["http://localhost:5173", "http://localhost:4173", "http://medical.zzdev.ru"]
-REDIS_DATA_URL = "redis://localhost:6379"
+# REDIS_DATA_URL = "redis://localhost:6379"
 logger = logging.getLogger(__name__)
 
 
@@ -32,11 +35,17 @@ app.add_middleware(
 )
 
 
+@app.get("/search", status_code=status.HTTP_200_OK)
+async def search(request: Request):
+    pass
+
+
+
 @app.get("/uzb", response_model=UZBDataResponse)
 async def uzbekistan_data(page: int = 1):
     """Эндпоинт для данных по Узбекистану"""
     data = await database.fetch(
-        """SELECT * FROM uzbekistan_data LIMIT 20 OFFSET ?""",
+        """SELECT * FROM uzbekistan_data LIMIT 20 OFFSET $1""",
         ((page - 1) * 20,),
         fetch_type="all",
     )
@@ -68,7 +77,7 @@ async def uzbekistan_data(page: int = 1):
 async def turkey_data(page: int = 1):
     """Эндпоинт для данных по Турции"""
     data = await database.fetch(
-        """SELECT * FROM turkey_data LIMIT 20 OFFSET ?""",
+        """SELECT * FROM turkey_data LIMIT 20 OFFSET $1""",
         ((page - 1) * 20,),
         fetch_type="all",
     )
@@ -93,7 +102,7 @@ async def turkey_data(page: int = 1):
 async def kazakhstan_data(page: int = 1):
     """Эндпоинт для данных по Казахстану"""
     data = await database.fetch(
-        """SELECT * FROM kazakhstan_data LIMIT 20 OFFSET ?""",
+        """SELECT * FROM kazakhstan_data LIMIT 20 OFFSET $1""",
         ((page - 1) * 20,),
         fetch_type="all",
     )
@@ -121,13 +130,13 @@ async def kazakhstan_data(page: int = 1):
 async def russian_data(page: int = 1):
     """Эндпоинт для данных по России"""
     data = await database.fetch(
-        """SELECT * FROM russia_data LIMIT 20 OFFSET ?""",
-        ((page - 1) * 20,),
-        fetch_type="all",
+        """SELECT * FROM russia_data LIMIT 20 OFFSET $1""",
+        params=((page - 1) * 20,),
+        number=50
     )
     meta_data = await database.fetch(
         """SELECT COUNT(*) FROM russia_data""",
-        fetch_type="one",
+        number=50
     )
     return {
         "data": data,
@@ -179,7 +188,7 @@ async def belarus_data(page: int = 1):
     return {}
 
 
-@app.get("ukr", status_code=404)
+@app.get("/ukr", status_code=404)
 async def ukraine_data(page: int = 1):
     """Эндпоинт для данных по Украине"""
     return {}
@@ -190,9 +199,3 @@ async def moldova_data(page: int = 1):
     """Эндпоинт для данных по Молдове"""
     return {}
 
-
-@app.on_event("startup")
-async def startup():
-    RussiaData.Meta.database = get_redis_connection(
-        url=REDIS_DATA_URL, decode_responses=True
-    )

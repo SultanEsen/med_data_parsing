@@ -10,6 +10,19 @@ logger = logging.getLogger(__name__)
 IGNORE_FILES = (".DS_Store", "desktop.ini", "Thumbs.db", ".~lock.", ".csv")
 
 
+def isfloat(value):
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False
+
+def check_and_remove_space(value, index):
+    if len(value) > index:
+        if value[index] == " ":
+            value = value[:index] + value[index + 1:]
+    return value
+
 def get_latest_files(directory: str):
     def get_creation_time(item):
         return item.stat().st_ctime

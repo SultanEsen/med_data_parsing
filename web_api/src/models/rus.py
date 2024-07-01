@@ -1,7 +1,9 @@
-from redis_om import HashModel
+# from redis_om import HashModel
+from pydantic import BaseModel
 
 
-class RussiaData(HashModel):
+class RussiaData(BaseModel):
+    id: int
     mnn: str
     trade_mark_name: str
     medicine_info: str
@@ -9,3 +11,13 @@ class RussiaData(HashModel):
     ath_code: str
     amount: int | str
     limit_price: float
+
+
+# class RussiaData(HashModel):
+#     mnn: str
+#     trade_mark_name: str
+#     medicine_info: str
+#     producer: str
+#     ath_code: str
+#     amount: int | str
+#     limit_price: float

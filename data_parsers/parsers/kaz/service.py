@@ -1,6 +1,7 @@
 from parsers.kaz.kaz_crawler import KazCrawler
 from parsers.kaz.kaz_parser import KazFileParser
-from parsers.kaz.repository import DocumentRepo, DataRepo
+from parsers.kaz.repository import DataRepo
+from parsers.repository import DocumentRepo
 from utils import get_latest_files
 
 from pathlib import Path
@@ -29,8 +30,11 @@ class KazService:
             iframe_page = self.crawler.find_iframe_link(initial_page)
             if iframe_page:
                 document_page = self.crawler.find_document_link(iframe_page)
-                if document_page:
+                item = await self.repo.get(document_page)
+                if document_page and not item:
+                    logger.info(f"Found {document_page} for KAZAKHSTAN")
                     self.file = self.crawler.load_document(document_page)
+                    await self.repo.add(url=document_page, country="kaz")
 
     def process_headings(self, headings: list):
         return list(map(lambda x: x.replace('\n', ''), headings))
@@ -85,6 +89,15 @@ class KazService:
                 'Регистрационноеудостоверение',
                 'Предельная ценапроизводителя'
             ]]
+            data['Предельная ценапроизводителя'] = data['Предельная ценапроизводителя'].str.replace(',', '.')
+            data['Предельная ценапроизводителя'] = data['Предельная ценапроизводителя'].str.replace(' ', '')
+            data['Предельная ценапроизводителя'] = data['Предельная ценапроизводителя'].fillna(0)
+            data['Торговоенаименование'] = data['Торговоенаименование'].str.replace('\n', ' ')
+            data['Лекарственнаяформа'] = data['Лекарственнаяформа'].str.replace('\n', ' ')
+            data['Лекарственнаяформа'] = data['Лекарственнаяформа'].str.replace('д л я', 'для')
+            data['Производитель'] = data['Производитель'].str.replace('\n', ' ')
+            data['МНН'] = data['МНН'].str.replace('\n', ' ')
+            data['Регистрационноеудостоверение'] = data['Регистрационноеудостоверение'].str.replace('\n', ' ')
             converted_data = data.values.tolist()
             if ind != 0:
                 self.cache.append(converted_data[0])

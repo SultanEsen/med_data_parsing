@@ -27,16 +27,9 @@ class DataRepo:
 
     async def copy_from_csv(self, path):
         logger.info(f"Path: {path}")
-        await self.session.execute(
-            f"""
-            COPY russia_data(
-                mnn, trade_mark_name,
-                medicine_info, producer, ath_code, amount,
-                limit_price
-            ) FROM {path}
-            WITH DELIMITER AS ','
-            CSV HEADER
-            """
+        await self.session.copy_from_csv(
+            table_name="russia_data",
+            path=path
         )
 
     async def count(self):

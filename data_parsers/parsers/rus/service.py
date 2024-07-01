@@ -21,7 +21,11 @@ class RuService:
         self.downloader = httpx.AsyncClient()
         self.crawler = RuCrawler(
             url=RuCrawler.MAIN_URL, 
-            download_dir=Path(RuCrawler.GENERAL_DOCUMENTS_DIRECTORY, RuCrawler.DOCUMENTS_DIRECTORY)
+            download_dir=Path(
+                PROJECT_ROOT, 
+                RuCrawler.GENERAL_DOCUMENTS_DIRECTORY,
+                RuCrawler.DOCUMENTS_DIRECTORY
+            )
         )
         self.parser = RuFileParser()
         self.repo = DocumentRepo(session)
@@ -49,8 +53,6 @@ class RuService:
                 downloaded_file = Path(self.crawler.download_dir, f"tmp/{file_name}.zip")
                 with open(downloaded_file, "wb") as f:
                     async with self.downloader.stream(method="GET", url=file_url, timeout=120) as file:
-                        total_size = int(file.headers.get("Content-Length", 0))
-                        logger.info(f"Total size: {total_size}")
                         async for chunk in file.aiter_bytes():
                             f.write(chunk)
                 if not await wait_for_download(file_location=download_dir, file_name=f"{file_name}.zip", timeout=120):
@@ -85,10 +87,10 @@ class RuService:
             self.zipfile = downloaded_file
             file_name = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
             with ZipFile(self.zipfile, "r") as zipref:
-                zipref.extractall(path=Path(self.crawler.download_dir))
-            self.file = Path(self.crawler.download_dir / f"{file_name}.xlsx")
+                zipref.extractall(path=self.crawler.download_dir)
+            self.file = Path(self.crawler.download_dir, f"{file_name}.xlsx")
 
-            rmtree(Path(self.crawler.download_dir / "tmp"))
+            rmtree(Path(self.crawler.download_dir, "tmp/"))
 
     def parse_data(self):
         file = get_latest_files(RuCrawler.DOCUMENTS_DIRECTORY)
@@ -149,6 +151,13 @@ class RuService:
             # end = perf_counter()
             # logger.info(f"{(end - start) * 1000} ms")
 
+    def copy_csv(self):
+        # self.tables.drop(self.tables.index[0], axis=0, inplace=True)
+        self.tables.to_csv(Path(self.crawler.download_dir, "rus.csv"), index=False)
+        # await self.data_repo.copy_from_csv(f"{Path(PROJECT_ROOT, self.crawler.download_dir)}/rus.csv")
+        # logger.info(f"Data successfully saved from file {self.file}")
+
+
     async def save_data(self):
         self.process_columns(self.tables)
         # if len(self.tables) > 5_000:
@@ -160,11 +169,9 @@ class RuService:
         #         await self.data_repo.add(chunk)
         # else:
         #     await self.data_repo.add(self.tables)
-        logger.info(Path(PROJECT_ROOT, self.crawler.download_dir))
-        self.tables.to_csv(f"{Path(PROJECT_ROOT, self.crawler.download_dir)}/rus.csv", index=False)
-        await self.data_repo.add(self.tables)
-        # await self.data_repo.copy_from_csv(f"{Path(PROJECT_ROOT, self.crawler.download_dir)}/rus.csv")
-        # logger.info(f"Data successfully saved from file {self.file}")
+        # await self.data_repo.add(self.tables)
+        self.copy_csv()
+
 
     async def parse(self):
         """
