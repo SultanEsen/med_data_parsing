@@ -30,8 +30,8 @@ async def main():
     # pprint(await service.data_repo.list())
 
     service = KazService(database)
-    # logger.info("Starting KAZ")
-    # await service.parse()
+    logger.info("Starting KAZ")
+    await service.parse()
 
     service = TURKService(database)
     # logger.info("Starting TURK")
@@ -39,8 +39,8 @@ async def main():
     # print("Count: ", await service.data_repo.count())
 
     service = RuService(database)
-    logger.info("Starting RUSSIA")
-    await service.parse()
+    # logger.info("Starting RUSSIA")
+    # await service.parse()
 
     service = MoldovaService(database)
     # logger.info("Starting MOLDOVA")

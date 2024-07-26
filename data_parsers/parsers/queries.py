@@ -12,7 +12,7 @@ class Queries:
     CREATE_UZBEKISTAN_DATA_TABLE = """
         CREATE TABLE IF NOT EXISTS uzbekistan_data (
             id serial PRIMARY KEY,
-            package_id INTEGER,
+            package_id TEXT ,
             trade_mark_name TEXT,
             mnn TEXT,
             producer TEXT,

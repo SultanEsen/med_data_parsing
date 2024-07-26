@@ -8,7 +8,7 @@ class KazData(BaseModel):
     dosage_form: str
     producer: str
     registration_number: str
-    limit_price: str
+    limit_price: str|float
 
 
 class IDataResponse(BaseModel):

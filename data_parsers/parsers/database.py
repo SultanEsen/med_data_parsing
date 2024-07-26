@@ -16,14 +16,14 @@ class Database:
         conn = await asyncpg.connect(self.path)
         # await conn.execute(Queries.VACUUM)
         await conn.execute(Queries.CREATE_LATEST_DOCUMENTS_TABLE)
-        # await conn.execute(Queries.DROP_UZBEKISTAN_DATA_TABLE)
-        # await conn.execute(Queries.CREATE_UZBEKISTAN_DATA_TABLE)
+        await conn.execute(Queries.DROP_UZBEKISTAN_DATA_TABLE)
+        await conn.execute(Queries.CREATE_UZBEKISTAN_DATA_TABLE)
         # await conn.execute(Queries.DROP_TURKEY_DATA_TABLE)
-        await conn.execute(Queries.CREATE_TURKEY_DATA_TABLE)
+        # await conn.execute(Queries.CREATE_TURKEY_DATA_TABLE)
         # await conn.execute(Queries.DROP_KAZAKHSTAN_DATA_TABLE)
         # await conn.execute(Queries.CREATE_KAZAKHSTAN_DATA_TABLE)
         # await conn.execute(Queries.DROP_RUSSIA_DATA_TABLE)
-        await conn.execute(Queries.CREATE_RUSSIA_DATA_TABLE)
+        # await conn.execute(Queries.CREATE_RUSSIA_DATA_TABLE)
         # await conn.commit()
         logger.info("Created tables")
         await conn.close()
@@ -59,6 +59,11 @@ class Database:
         conn = await asyncpg.connect(self.path)
         await conn.execute(query, *params)
         # await conn.commit()
+
+    async def count(self, table_name: str):
+        conn = await asyncpg.connect(self.path)
+        row_count = await conn.fetchrow(f"SELECT COUNT(*) FROM {table_name}")
+        return row_count
 
     async def execute_many(
         self,

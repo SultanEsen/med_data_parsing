@@ -29,7 +29,7 @@ class UZBService:
             urls = self.crawler.find_latest_document(text)
             if urls:
                 item = await self.repo.get(urls)
-                if not item:
+                if item:
                     logger.info("Downloading file ...")
                     self.crawler.load_document(urls)
                     await self.repo.add(country="uzb", url=urls)
@@ -55,8 +55,9 @@ class UZBService:
                 yield pd.DataFrame(data, columns=self.headings), ind
 
     def process_columns(self, df, ind):
-        logger.info(f"Processing table {df.columns}")
-        df['ИД упаковки'] = df['ИД упаковки'].astype('int64')
+        # logger.info(f"Processing table {df.columns}")
+        # df['ИД упаковки'] = df['ИД упаковки'].astype('int64')
+        df['ИД упаковки'] = df['ИД упаковки'].str.replace(" ", "")
         df['Валюта'] = df['Валюта'].astype('category')
         df['Предельная цена'] = df['Предельная цена'].str.replace(",", ".")
         df['Предельная цена'] = df['Предельная цена'].str.replace(" ", "")
@@ -78,6 +79,7 @@ class UZBService:
                 is incorrect, shoud be 11 but now is {df.shape[1]}, \
                 table number is {ind+1}"
             df = self.process_columns(df, ind)
+            logger.info(f"Saving table {ind+1} ...")
             data: pd.DataFrame = df[[
                 'ИД упаковки',
                 'Торговая марка',

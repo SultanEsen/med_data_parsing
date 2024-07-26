@@ -6,6 +6,7 @@ from utils import get_latest_files
 
 from pathlib import Path
 import pandas as pd
+import numpy as np
 import logging
 
 
@@ -72,7 +73,8 @@ class KazService:
             fixed_row = ['' for _ in range(len(self.cache[0]))]
             for row in self.cache:
                 for col_index, col in enumerate(row):
-                    fixed_row[col_index] += col
+                    fixed_row[col_index] += str(col)
+
         else:
             fixed_row = self.cache[0]
         self.cache = []
@@ -91,24 +93,25 @@ class KazService:
             ]]
             data['Предельная ценапроизводителя'] = data['Предельная ценапроизводителя'].str.replace(',', '.')
             data['Предельная ценапроизводителя'] = data['Предельная ценапроизводителя'].str.replace(' ', '')
-            data['Предельная ценапроизводителя'] = data['Предельная ценапроизводителя'].fillna(0)
+            data['Предельная ценапроизводителя'] = data['Предельная ценапроизводителя'].fillna(0).astype(str)
             data['Торговоенаименование'] = data['Торговоенаименование'].str.replace('\n', ' ')
             data['Лекарственнаяформа'] = data['Лекарственнаяформа'].str.replace('\n', ' ')
             data['Лекарственнаяформа'] = data['Лекарственнаяформа'].str.replace('д л я', 'для')
             data['Производитель'] = data['Производитель'].str.replace('\n', ' ')
             data['МНН'] = data['МНН'].str.replace('\n', ' ')
+            data['МНН'] = data['МНН'].replace('Нет данных', np.nan).astype(str)
             data['Регистрационноеудостоверение'] = data['Регистрационноеудостоверение'].str.replace('\n', ' ')
             converted_data = data.values.tolist()
             if ind != 0:
                 self.cache.append(converted_data[0])
                 converted_data[0] = self.fix_broken_rows()
-            if ind != self.number_of_tables - 1:
+            if ind != self.number_of_tables - 1:            
                 self.cache.append(converted_data[-1])
-                converted_data = converted_data[:-1]
+                converted_data = converted_data[:-1]    
             # logger.info(converted_data)
             await self.data_repo.add(converted_data)
             logger.info(f"Saved {data.shape[0]} rows")
 
     async def parse(self):
-        # await self.download_file()
+        await self.download_file()
         await self.save_data()

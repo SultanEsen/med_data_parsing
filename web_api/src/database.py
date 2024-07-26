@@ -6,7 +6,7 @@ class Database:
     def __init__(self, path):
         self.path = path
 
-    async def fetch(self, query: str, params: tuple = (), number: int = 1):
+    async def fetch(self, query: str, number: int = 1, params: tuple = ()):
         conn = await asyncpg.connect(self.path)
         async with conn.transaction():
             # logger.info(f"Query: {query}, params: {params}")
@@ -31,3 +31,7 @@ class Database:
         #     await conn.execute(query, params)
         #     await conn.commit()
 
+    async def count(self, table_name: str, params: tuple = ("1=1")):
+        conn = await asyncpg.connect(self.path)
+        row_count = await conn.fetchrow(f"SELECT COUNT(*) FROM {table_name}")
+        return row_count

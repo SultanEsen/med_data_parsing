@@ -63,10 +63,15 @@ class DataRepo:
                 row[5] = float(row[5].replace(',', '.'))
             else:
                 row[5] = None
+        
+            if row[1].casefold() == 'nan':
+                row[1] = None
+            else:
+                row[1] = check_and_remove_space(row[1], 8)
+                row[1] = check_and_remove_space(row[1], 9)
             # if row[1] and len(row[1])>9 and row[1][8] == ' ':
             #     row[1] = row[1][:8] + row[1][9:]
-            row[1] = check_and_remove_space(row[1], 8)
-            row[1] = check_and_remove_space(row[1], 9)
+           
             logger.info(f"Row: {i}, {row}")
             await self.session.execute(
                 """
@@ -83,20 +88,16 @@ class DataRepo:
             )
 
     async def count(self):
-        count = await self.session.fetch(
-            """
-            SELECT COUNT(*) FROM kazakhstan_data
-            """
-        )
+        count = await self.session.count("kazakhstan_data")
         return count
 
-    async def get(self, id):
+    async def get(self, data_id):
         item = await self.session.fetch(
             """
-            SELECT * FROM kazakhstan_data WHERE id = ?
+            SELECT * FROM kazakhstan_data WHERE id = $1
             """,
-            (id,),
-            fetch_type="one"
+            (data_id,),
+            number=1
         )
         return item
 
@@ -105,6 +106,6 @@ class DataRepo:
             """
             SELECT * FROM kazakhstan_data
             """,
-            fetch_type="all"
+            number=20
         )
         return items
